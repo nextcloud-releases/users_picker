@@ -1,5 +1,4 @@
-import {} from '@nextcloud/vue-richtext'
-import { registerWidget } from '@nextcloud/vue/dist/Components/NcRichText.js'
+import { registerWidget, registerCustomPickerElement, NcCustomPickerRenderResult } from '@nextcloud/vue/dist/Components/NcRichText.js'
 
 __webpack_nonce__ = btoa(OC.requestToken) // eslint-disable-line
 __webpack_public_path__ = OC.linkTo('users_picker', 'js/') // eslint-disable-line
@@ -17,3 +16,20 @@ registerWidget('users_picker_profile', async (el, { richObjectType, richObject, 
 		},
 	}).$mount(el)
 })
+
+registerCustomPickerElement('profile_picker', async (el, { providerId, accessible }) => {
+	const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
+	Vue.mixin({ methods: { t, n } })
+	const { default: UserProfilesCustomPicker } = await import(/* webpackChunkName: "image-picker-lazy" */'./components/UserProfilesCustomPicker.vue')
+	const Element = Vue.extend(UserProfilesCustomPicker)
+	const vueElement = new Element({
+		propsData: {
+			providerId,
+			accessible,
+		},
+	}).$mount(el)
+	return new NcCustomPickerRenderResult(vueElement.$el, vueElement)
+}, (el, renderResult) => {
+	console.debug('Users picker custom picker destroy callback. el', el, 'renderResult:', renderResult)
+	renderResult.object.$destroy()
+}, 'small')

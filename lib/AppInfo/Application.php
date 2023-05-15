@@ -29,6 +29,10 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\Collaboration\Reference\RenderReferenceEvent;
+
+use OCA\UsersPicker\Listener\UsersPickerReferenceListener;
+use OCA\UsersPicker\Reference\UsersPickerReferenceProvider;
 
 /**
  * Class Application
@@ -37,19 +41,13 @@ use OCP\AppFramework\Bootstrap\IBootstrap;
  */
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'users_picker';
-	/**
-	 * Constructor
-	 *
-	 * @param array $urlParams
-	 */
+
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_ID, $urlParams);
 	}
 
 	public function register(IRegistrationContext $context): void {
-		$context->registerSearchProvider(\OCA\UsersPicker\Search\UsersPickerSearchProfilesProvider::class);
-
-		$context->registerReferenceProvider(\OCA\UsersPicker\Reference\UsersPickerReferenceProvider::class);
+		$context->registerReferenceProvider(UsersPickerReferenceProvider::class);
 		$context->registerEventListener(RenderReferenceEvent::class, UsersPickerReferenceListener::class);
 	}
 
