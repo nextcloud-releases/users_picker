@@ -92,10 +92,7 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 	 * @inheritDoc
 	 */
 	public function matchReference(string $referenceText): bool {
-		if (preg_match('/^https:\/\/[\w\-.]+(:\d+)?\/\S+\/u\/\w+$/i', $referenceText) === 1) {
-			return true;
-		}
-		return false;
+		return $this->getObjectId($referenceText) !== null;
 	}
 
 	/**
@@ -107,14 +104,24 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 			$user = $this->userManager->get($userId);
 			if ($user !== null) {
 				$reference = new Reference($referenceText);
+
+				$userDisplayName = $user->getDisplayName();
+				$userEmail = $user->getEMailAddress();
+				$userAvatarUrl = $this->urlGenerator->linkToRouteAbsolute('core.avatar.getAvatar', ['userId' => $userId, 'size' => '64']);
+
+				// for clients who can't render the reference widgets
+				$reference->setTitle($userDisplayName);
+				$reference->setDescription($userEmail ?? $userDisplayName);
+				$reference->setImageUrl($userAvatarUrl);
+
+				// for the Vue reference widget
 				$reference->setRichObject(
 					self::RICH_OBJECT_TYPE,
 					[
 						'user_id' => $userId,
-						'title' => $user->getDisplayName(),
-						'subline' => $user->getDisplayName(),
-						'email' => 	$user->getEMailAddress(),
-						'thumbnail_url' => null,
+						'title' => $userDisplayName,
+						'subline' => $userEmail ?? $userDisplayName,
+						'email' => 	$userEmail,
 						'url' => $referenceText,
 					]
 				);
@@ -126,8 +133,19 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 	}
 
 	private function getObjectId(string $url): ?string {
-		$userId = explode('/u/', $url)[1];
-		return $userId;
+		$baseUrl = $this->urlGenerator->getBaseUrl();
+		$baseWithIndex = $baseUrl . '/index.php';
+
+		preg_match('/^' . preg_quote($baseUrl, '/') . '\/u\/(\w+)$/', $url, $matches);
+		if (count($matches) > 1) {
+			return $matches[1];
+		}
+		preg_match('/^' . preg_quote($baseWithIndex, '/') . '\/u\/(\w+)$/', $url, $matches);
+		if (count($matches) > 1) {
+			return $matches[1];
+		}
+
+		return null;
 	}
 
 	/**

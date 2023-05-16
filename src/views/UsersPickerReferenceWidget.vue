@@ -25,13 +25,10 @@
 <template>
 	<div class="users_picker-reference">
 		<div class="users_picker-wrapper">
-			<template v-if="richObject.thumbnail_url">
-				<img :src="richObject.thumbnail_url" :height="48">
-			</template>
-			<UserIcon v-else :size="48" />
+			<NcAvatar :user="richObject.user_id" />
 			<div class="link-content">
 				<div class="profile-title">
-					<a :href="userProfileUrl" target="_blank">
+					<a :href="richObject.url" target="_blank">
 						<strong>
 							{{ richObject.title }}
 						</strong>
@@ -46,19 +43,15 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import { generateUrl } from '@nextcloud/router'
-import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip.js'
-
-import UserIcon from '../components/icons/UserIcon.vue'
-
-Vue.directive('tooltip', Tooltip)
+import NcAvatar from '@nextcloud/vue/dist/Components/NcAvatar.js'
 
 export default {
 	name: 'UsersPickerReferenceWidget',
+
 	components: {
-		UserIcon,
+		NcAvatar,
 	},
+
 	props: {
 		richObjectType: {
 			type: String,
@@ -73,14 +66,13 @@ export default {
 			default: true,
 		},
 	},
+
 	data() {
 		return {
 		}
 	},
+
 	computed: {
-		userProfileUrl() {
-			return generateUrl(`/u/${this.richObject.user_id}`)
-		},
 	},
 }
 </script>
