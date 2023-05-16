@@ -151,8 +151,9 @@ export default {
 				margin-right: 5px;
 			}
 
-			& span {
+			& > span {
 				display: flex;
+				align-items: center;
 				margin-bottom: 5px;
 			}
 		}
