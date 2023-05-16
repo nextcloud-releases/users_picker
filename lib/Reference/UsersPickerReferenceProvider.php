@@ -115,6 +115,9 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 				// TODO: Check user property scope (if we have to check the access to the property)
 				$bio = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_BIOGRAPHY)->getValue();
 				$location = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_ADDRESS)->getValue();
+				$website = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_WEBSITE)->getValue();
+				$organisation = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_ORGANISATION)->getValue();
+				$role = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_ROLE)->getValue();
 
 				// for clients who can't render the reference widgets
 				$reference->setTitle($userDisplayName);
@@ -131,6 +134,9 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 						'email' => $userEmail,
 						'bio' => isset($bio) && $bio !== '' ? substr_replace(explode('\n\r', $bio, 1)[0], '...', 80, strlen($bio)) : null,
 						'location' => $location,
+						'website' => $website,
+						'organisation' => $organisation,
+						'role' => $role,
 						'url' => $referenceText,
 					]
 				);

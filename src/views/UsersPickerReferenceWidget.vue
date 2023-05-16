@@ -42,6 +42,18 @@
 						<MapMarker :size="20" />
 						{{ richObject.location }}
 					</span>
+					<span v-if="richObject.website" class="website">
+						<Web :size="20" />
+						<a :href="richObject.website" class="link" target="_blank">{{ richObject.website }}</a>
+					</span>
+					<span v-if="richObject.organisation" class="organisation">
+						<Domain :size="20" />
+						{{ richObject.organisation }}
+					</span>
+					<span v-if="richObject.role" class="role">
+						<Handshake :size="20" />
+						{{ richObject.role }}
+					</span>
 					<span v-if="richObject.bio" class="bio">
 						<TextAccount :size="20" />
 						{{ richObject.bio }}
@@ -58,6 +70,9 @@ import NcAvatar from '@nextcloud/vue/dist/Components/NcAvatar.js'
 import MapMarker from 'vue-material-design-icons/MapMarker.vue'
 import TextAccount from 'vue-material-design-icons/TextAccount.vue'
 import UserIcon from '../components/icons/UserIcon.vue'
+import Domain from 'vue-material-design-icons/Domain.vue'
+import Web from 'vue-material-design-icons/Web.vue'
+import Handshake from 'vue-material-design-icons/Handshake.vue'
 
 export default {
 	name: 'UsersPickerReferenceWidget',
@@ -67,6 +82,9 @@ export default {
 		MapMarker,
 		TextAccount,
 		UserIcon,
+		Domain,
+		Web,
+		Handshake,
 	},
 
 	props: {
