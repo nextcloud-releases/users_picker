@@ -34,6 +34,7 @@ use OCP\IL10N;
 use OCP\IURLGenerator;
 
 use OCA\UsersPicker\AppInfo\Application;
+use OCP\Accounts\IAccountManager;
 use OCP\IUserManager;
 
 class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
@@ -45,12 +46,14 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 	private IURLGenerator $urlGenerator;
 	private LinkReferenceProvider $linkReferenceProvider;
 	private IUserManager $userManager;
+	private IAccountManager $accountManager;
 
 	public function __construct(
 		IL10N $l10n,
 		IURLGenerator $urlGenerator,
 		LinkReferenceProvider $linkReferenceProvider,
 		IUserManager $userManager,
+		IAccountManager $accountManager,
 		?string $userId
 	) {
 		$this->userId = $userId;
@@ -58,6 +61,7 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 		$this->urlGenerator = $urlGenerator;
 		$this->linkReferenceProvider = $linkReferenceProvider;
 		$this->userManager = $userManager;
+		$this->accountManager = $accountManager;
 	}
 
 	/**
@@ -108,6 +112,9 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 				$userDisplayName = $user->getDisplayName();
 				$userEmail = $user->getEMailAddress();
 				$userAvatarUrl = $this->urlGenerator->linkToRouteAbsolute('core.avatar.getAvatar', ['userId' => $userId, 'size' => '64']);
+				// TODO: Check user property scope (if we have to check the access to the property)
+				$bio = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_BIOGRAPHY)->getValue();
+				$location = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_ADDRESS)->getValue();
 
 				// for clients who can't render the reference widgets
 				$reference->setTitle($userDisplayName);
@@ -121,7 +128,9 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 						'user_id' => $userId,
 						'title' => $userDisplayName,
 						'subline' => $userEmail ?? $userDisplayName,
-						'email' => 	$userEmail,
+						'email' => $userEmail,
+						'bio' => isset($bio) && $bio !== '' ? substr_replace(explode('\n\r', $bio, 1)[0], '...', 80, strlen($bio)) : null,
+						'location' => $location,
 						'url' => $referenceText,
 					]
 				);

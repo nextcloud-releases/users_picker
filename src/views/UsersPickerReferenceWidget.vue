@@ -25,18 +25,28 @@
 <template>
 	<div class="users_picker-reference">
 		<div class="users_picker-wrapper">
-			<NcAvatar :user="richObject.user_id" />
-			<div class="link-content">
+			<div class="profile-card-header">
+				<NcAvatar :user="richObject.user_id" :size="48" class="profile-avatar" />
 				<div class="profile-title">
 					<a :href="richObject.url" target="_blank">
+						<UserIcon :size="20" />
 						<strong>
-							{{ richObject.title }}
+							{{ richObject.email !== null ? richObject.title + ' - ' + richObject.email : richObject.title }}
 						</strong>
 					</a>
-					<span class="profile-subline">
-						{{ richObject.subline }}
-					</span>
 				</div>
+			</div>
+			<div class="profile-content">
+				<p class="profile-subline">
+					<span v-if="richObject.location" class="location">
+						<MapMarker :size="20" />
+						{{ richObject.location }}
+					</span>
+					<span v-if="richObject.bio" class="bio">
+						<TextAccount :size="20" />
+						{{ richObject.bio }}
+					</span>
+				</p>
 			</div>
 		</div>
 	</div>
@@ -45,11 +55,18 @@
 <script>
 import NcAvatar from '@nextcloud/vue/dist/Components/NcAvatar.js'
 
+import MapMarker from 'vue-material-design-icons/MapMarker.vue'
+import TextAccount from 'vue-material-design-icons/TextAccount.vue'
+import UserIcon from '../components/icons/UserIcon.vue'
+
 export default {
 	name: 'UsersPickerReferenceWidget',
 
 	components: {
 		NcAvatar,
+		MapMarker,
+		TextAccount,
+		UserIcon,
 	},
 
 	props: {
@@ -81,18 +98,63 @@ export default {
 .users_picker-reference {
 	width: 100%;
 	white-space: normal;
-	padding: 12px;
+	display: flex;
 
 	.users_picker-wrapper {
+		width: 100%;
 		display: flex;
-		flex-direction: row;
 		align-items: center;
+		flex-direction: column;
 
-		.link-content {
+		.profile-card-header {
+			width: 100%;
+			min-height: 70px;
+			background-color: var(--color-primary);
+			background-image: var(--gradient-primary-background);
+			position: relative;
+
+			.profile-avatar {
+				position: relative;
+				bottom: -50%;
+				left: 10px;
+			}
+
+			.profile-title {
+				display: flex;
+				position: relative;
+				bottom: 5px;
+				left: 70px;
+
+				& span {
+					margin-right: 5px;
+				}
+
+				& a {
+					display: flex;
+					color: #fff;
+				}
+			}
+		}
+
+		.profile-content {
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
-			margin-left: 12px;
+			margin-left: 20px;
+			min-height: 46px;
+			padding: 10px 0 10px 60px;
+			width: 100%;
+		}
+
+		.profile-subline {
+			& span.material-design-icon {
+				margin-right: 5px;
+			}
+
+			& span {
+				display: flex;
+				margin-bottom: 5px;
+			}
 		}
 	}
 }

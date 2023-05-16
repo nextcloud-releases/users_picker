@@ -1,25 +1,32 @@
 <template>
 	<div class="profiles-picker-content">
-		<h2>
-			{{ t('integration_openai', 'User profiles picker') }}
-		</h2>
-		<div class="input-wrapper">
-			<NcSelect ref="profiles-search-input"
-				v-model="selectedProfile"
-				input-id="profiles-search-input"
-				:loading="loading"
-				:filterable="false"
-				:placeholder="t('users_picker', 'Search for a user profile')"
-				:clear-search-on-blur="() => false"
-				:user-select="true"
-				:multiple="false"
-				:options="profiles"
-				@search="searchForProfile"
-				@option:selected="submit">
-				<template #no-options>
-					{{ searchQuery ? t('users_picker', 'Not found') : t('users_picker', 'Search for a user profile. Start typing') }}
+		<div class="heading">
+			<h2>
+				{{ t('integration_openai', 'User profiles picker') }}
+			</h2>
+			<div class="input-wrapper">
+				<NcSelect ref="profiles-search-input"
+					v-model="selectedProfile"
+					input-id="profiles-search-input"
+					:loading="loading"
+					:filterable="false"
+					:placeholder="t('users_picker', 'Search for a user profile')"
+					:clear-search-on-blur="() => false"
+					:user-select="true"
+					:multiple="false"
+					:options="profiles"
+					@search="searchForProfile"
+					@option:selecting="resolveResult">
+					<template #no-options>
+						{{ searchQuery ? t('users_picker', 'Not found') : t('users_picker', 'Search for a user profile. Start typing') }}
+					</template>
+				</NcSelect>
+			</div>
+			<NcEmptyContent class="empty-content">
+				<template #icon>
+					<UserIcon />
 				</template>
-			</NcSelect>
+			</NcEmptyContent>
 		</div>
 		<div class="footer">
 			<NcButton v-if="selectedProfile !== null"
@@ -38,9 +45,11 @@
 
 <script>
 import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue'
+import UserIcon from './icons/UserIcon.vue'
 
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
+import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 
 import axios from '@nextcloud/axios'
 import { generateOcsUrl, generateUrl } from '@nextcloud/router'
@@ -52,6 +61,8 @@ export default {
 		NcSelect,
 		NcButton,
 		ArrowRightIcon,
+		UserIcon,
+		NcEmptyContent,
 	},
 
 	props: {
@@ -81,15 +92,10 @@ export default {
 	},
 
 	watch: {
-		profiles() {
-			this.selectedProfile = this.profiles[0]
-		},
 	},
 
 	mounted() {
 		this.focusOnInput()
-		// this.searchQuery = 'use'
-		// this.searchForProfile()
 	},
 
 	methods: {
@@ -104,9 +110,8 @@ export default {
 				return
 			}
 			this.loading = true
-			const url = generateOcsUrl('core/autocomplete/get?search={searchQuery}&itemType=%20&itemId=%20&shareTypes[]=0&limit=5', { searchQuery: this.searchQuery })
+			const url = generateOcsUrl('core/autocomplete/get?search={searchQuery}&itemType=%20&itemId=%20&shareTypes[]=0&limit=20', { searchQuery: this.searchQuery })
 			await axios.get(url).then(res => {
-				console.debug(res.data)
 				this.profiles = res.data.ocs.data.map(userAutocomplete => {
 					return {
 						user: userAutocomplete.id,
@@ -116,7 +121,6 @@ export default {
 						isNoUser: userAutocomplete.source.startsWith('users'),
 					}
 				})
-				console.debug(this.profiles)
 				this.loading = false
 			}).catch(err => {
 				console.debug(err)
@@ -124,12 +128,13 @@ export default {
 		},
 		submit() {
 			this.resultUrl = window.location.origin + generateUrl(`/u/${this.selectedProfile.user.trim().toLowerCase()}`, null, { noRewrite: true })
-			// this.resolveResult()
 			this.$emit('submit', this.resultUrl)
 		},
-		resolveResult() {
+		resolveResult(selectedItem) {
 			this.loading = true
 			this.abortController = new AbortController()
+			this.selectedProfile = selectedItem
+			this.resultUrl = window.location.origin + generateUrl(`/u/${this.selectedProfile.user.trim().toLowerCase()}`, null, { noRewrite: true })
 			axios.get(generateOcsUrl('references/resolve', 2) + '?reference=' + encodeURIComponent(this.resultUrl), {
 				signal: this.abortController.signal,
 			})
@@ -143,18 +148,34 @@ export default {
 					this.loading = false
 				})
 		},
+		clearSelection() {
+			console.debug('clearSelection')
+			this.selectedProfile = null
+			this.resultUrl = null
+			this.reference = null
+		},
 	},
 }
 </script>
 
 <style scoped lang="scss">
+.heading, .select {
+	width: 100%;
+}
+
 .profiles-picker-content {
 	width: 100%;
+	min-height: 450px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	justify-content: center;
+	justify-content: space-between;
 	padding: 12px 16px 16px 16px;
+	position: relative;
+
+	h2 {
+		text-align: center;
+	}
 
 	.footer {
 		width: 100%;

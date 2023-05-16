@@ -32,4 +32,4 @@ registerCustomPickerElement('profile_picker', async (el, { providerId, accessibl
 }, (el, renderResult) => {
 	console.debug('Users picker custom picker destroy callback. el', el, 'renderResult:', renderResult)
 	renderResult.object.$destroy()
-}, 'small')
+}, 'normal')
