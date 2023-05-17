@@ -38,6 +38,9 @@
 			</div>
 			<div class="profile-content">
 				<p class="profile-subline">
+					<span v-if="richObject.headline" class="headline">
+						{{ richObject.headline }}
+					</span>
 					<span v-if="richObject.location" class="location">
 						<MapMarker :size="20" />
 						{{ richObject.location }}
@@ -162,6 +165,11 @@ export default {
 			min-height: 46px;
 			padding: 10px 0 10px 60px;
 			width: 100%;
+		}
+
+		.headline {
+			font-style: italic;
+			padding-left: 5px;
 		}
 
 		.profile-subline {
