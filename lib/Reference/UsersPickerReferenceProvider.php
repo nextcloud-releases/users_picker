@@ -112,12 +112,13 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 				$userDisplayName = $user->getDisplayName();
 				$userEmail = $user->getEMailAddress();
 				$userAvatarUrl = $this->urlGenerator->linkToRouteAbsolute('core.avatar.getAvatar', ['userId' => $userId, 'size' => '64']);
-				// TODO: Check user property scope (if we have to check the access to the property)
-				$bio = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_BIOGRAPHY)->getValue();
-				$location = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_ADDRESS)->getValue();
-				$website = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_WEBSITE)->getValue();
-				$organisation = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_ORGANISATION)->getValue();
-				$role = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_ROLE)->getValue();
+
+				$bio = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_BIOGRAPHY);
+				$bio = $bio->getScope() !== IAccountManager::SCOPE_PRIVATE ? $bio->getValue() : null;
+				$location = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_ADDRESS);
+				$website = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_WEBSITE);
+				$organisation = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_ORGANISATION);
+				$role = $this->accountManager->getAccount($user)->getProperty(IAccountManager::PROPERTY_ROLE);
 
 				// for clients who can't render the reference widgets
 				$reference->setTitle($userDisplayName);
@@ -132,11 +133,11 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 						'title' => $userDisplayName,
 						'subline' => $userEmail ?? $userDisplayName,
 						'email' => $userEmail,
-						'bio' => isset($bio) && $bio !== '' ? substr_replace(explode('\n\r', $bio, 1)[0], '...', 80, strlen($bio)) : null,
-						'location' => $location,
-						'website' => $website,
-						'organisation' => $organisation,
-						'role' => $role,
+						'bio' => isset($bio) && $bio !== '' ? substr_replace($bio, '...', 80, strlen($bio)) : null,
+						'location' => $location->getScope() !== IAccountManager::SCOPE_PRIVATE ? $location->getValue() : null,
+						'website' => $website->getScope() !== IAccountManager::SCOPE_PRIVATE ? $website->getValue() : null,
+						'organisation' => $organisation->getScope() !== IAccountManager::SCOPE_PRIVATE ? $organisation->getValue() : null,
+						'role' => $role->getScope() !== IAccountManager::SCOPE_PRIVATE ? $role->getValue() : null,
 						'url' => $referenceText,
 					]
 				);
