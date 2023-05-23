@@ -43,7 +43,12 @@
 					</span>
 					<span v-if="richObject.location" class="location">
 						<MapMarker :size="20" />
-						{{ richObject.location }}
+						<template v-if="richObject.location_url">
+							<a :href="richObject.location_url" class="link" target="_blank">{{ richObject.location }}</a>
+						</template>
+						<template v-else>
+							{{ richObject.location }}
+						</template>
 					</span>
 					<span v-if="richObject.website" class="website">
 						<Web :size="20" />
@@ -182,6 +187,10 @@ export default {
 				align-items: center;
 				margin-bottom: 5px;
 			}
+		}
+
+		.link {
+			text-decoration: underline;
 		}
 	}
 }

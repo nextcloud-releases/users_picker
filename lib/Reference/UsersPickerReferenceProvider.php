@@ -137,6 +137,7 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 						'bio' => isset($bio) && $bio !== '' ? substr_replace($bio, '...', 80, strlen($bio)) : null,
 						'headline' => $headline->getScope() !== IAccountManager::SCOPE_PRIVATE ? $headline->getValue() : null,
 						'location' => $location->getScope() !== IAccountManager::SCOPE_PRIVATE ? $location->getValue() : null,
+						'location_url' => $location->getScope() !== IAccountManager::SCOPE_PRIVATE ? $this->getOpenStreetLocationUrl($location->getValue()) : null,
 						'website' => $website->getScope() !== IAccountManager::SCOPE_PRIVATE ? $website->getValue() : null,
 						'organisation' => $organisation->getScope() !== IAccountManager::SCOPE_PRIVATE ? $organisation->getValue() : null,
 						'role' => $role->getScope() !== IAccountManager::SCOPE_PRIVATE ? $role->getValue() : null,
@@ -164,6 +165,10 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 		}
 
 		return null;
+	}
+
+	private function getOpenStreetLocationUrl($location) {
+		return 'https://www.openstreetmap.org/search?query=' . urlencode($location);
 	}
 
 	/**
