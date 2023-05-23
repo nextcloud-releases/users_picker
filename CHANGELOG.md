@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0 - 2023-05-24]
+
+### Added
+
+- Added link to openstreetmap on user location
+
+### Fixed
+
+- Fixed modal close not working [#3](https://github.com/nextcloud/users_picker/issues/3) @andrey18106
+
 ## [0.1.0 - 2023-05-22]
 
 First release available at Nextcloud
