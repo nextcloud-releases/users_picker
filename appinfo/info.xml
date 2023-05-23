@@ -15,8 +15,8 @@
 	<website>https://github.com/nextcloud/users_picker</website>
 	<bugs>https://github.com/nextcloud/users_picker/issues</bugs>
 	<repository type="git">https://github.com/nextcloud/users_picker.git</repository>
-	<screenshot>https://raw.githubusercontent.com/nextcloud/users_picker/main/screenshots/users_picker_1.jpg</screenshot>
-	<screenshot>https://raw.githubusercontent.com/nextcloud/users_picker/main/screenshots/users_picker_2.jpg</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/users_picker/main/screenshots/users_picker_1.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/users_picker/main/screenshots/users_picker_2.png</screenshot>
 	<dependencies>
 		<nextcloud min-version="26" max-version="27"/>
 	</dependencies>
