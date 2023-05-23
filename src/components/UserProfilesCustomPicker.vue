@@ -171,7 +171,6 @@ export default {
 	align-items: center;
 	justify-content: space-between;
 	padding: 12px 16px 16px 16px;
-	position: relative;
 
 	h2 {
 		text-align: center;
