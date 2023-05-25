@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <info>
 	<id>users_picker</id>
-	<name>Users smart picker</name>
-	<summary>Users smart picker and link preview</summary>
-	<description><![CDATA[This app adds ability to search users via smart picker and link previews for them.]]></description>
-	<version>0.2.0</version>
+	<name>Profile picker</name>
+	<summary>Profile smart picker and link preview</summary>
+	<description><![CDATA[This app adds ability to search for user profiles via smart picker and link previews for them.]]></description>
+	<version>0.2.1</version>
 	<licence>agpl</licence>
 	<author mail="andrey18106x@gmail.com" homepage="https://github.com/andrey18106">Andrey Borysenko</author>
 	<namespace>UsersPicker</namespace>
@@ -17,6 +17,7 @@
 	<repository type="git">https://github.com/nextcloud/users_picker.git</repository>
 	<screenshot>https://raw.githubusercontent.com/nextcloud/users_picker/main/screenshots/users_picker_1.png</screenshot>
 	<screenshot>https://raw.githubusercontent.com/nextcloud/users_picker/main/screenshots/users_picker_2.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/users_picker/main/screenshots/users_picker_3.png</screenshot>
 	<dependencies>
 		<nextcloud min-version="26" max-version="27"/>
 	</dependencies>

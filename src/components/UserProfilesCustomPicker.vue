@@ -2,7 +2,7 @@
 	<div class="profiles-picker-content">
 		<div class="heading">
 			<h2>
-				{{ t('integration_openai', 'User profiles picker') }}
+				{{ t('users_picker', 'Profile picker') }}
 			</h2>
 			<div class="input-wrapper">
 				<NcSelect ref="profiles-search-input"
@@ -34,7 +34,7 @@
 				:aria-label="t('users_picker', 'Submit selected user profile')"
 				:disabled="loading || selectedProfile === null"
 				@click="submit">
-				{{ t('users_picker', 'Send') }}
+				{{ t('users_picker', 'Insert') }}
 				<template #icon>
 					<ArrowRightIcon />
 				</template>
