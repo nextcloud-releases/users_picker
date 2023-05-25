@@ -34,7 +34,7 @@
 				:aria-label="t('users_picker', 'Submit selected user profile')"
 				:disabled="loading || selectedProfile === null"
 				@click="submit">
-				{{ t('users_picker', 'Send') }}
+				{{ t('users_picker', 'Insert') }}
 				<template #icon>
 					<ArrowRightIcon />
 				</template>
