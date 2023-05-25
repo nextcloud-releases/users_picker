@@ -75,7 +75,7 @@ class UsersPickerReferenceProvider extends ADiscoverableReferenceProvider {
 	 * @inheritDoc
 	 */
 	public function getTitle(): string {
-		return $this->l10n->t('User profiles');
+		return $this->l10n->t('Profile picker');
 	}
 
 	/**

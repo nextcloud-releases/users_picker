@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.1 - 2023-05-26]
+
+### Changed
+
+- Wording changes [#4](https://github.com/nextcloud/users_picker/issues/4) @andrey18106
+
 ## [0.2.0 - 2023-05-24]
 
 ### Added

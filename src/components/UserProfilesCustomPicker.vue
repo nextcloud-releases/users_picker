@@ -2,7 +2,7 @@
 	<div class="profiles-picker-content">
 		<div class="heading">
 			<h2>
-				{{ t('integration_openai', 'User profiles picker') }}
+				{{ t('users_picker', 'Profile picker') }}
 			</h2>
 			<div class="input-wrapper">
 				<NcSelect ref="profiles-search-input"
