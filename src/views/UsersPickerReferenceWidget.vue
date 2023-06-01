@@ -166,9 +166,8 @@ export default {
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
-			margin-left: 20px;
 			min-height: 46px;
-			padding: 10px 0 10px 60px;
+			padding: 10px 10px 10px 60px;
 			width: 100%;
 		}
 
@@ -178,6 +177,8 @@ export default {
 		}
 
 		.profile-subline {
+			padding: 0 0 0 10px;
+
 			& span.material-design-icon {
 				margin-right: 5px;
 			}

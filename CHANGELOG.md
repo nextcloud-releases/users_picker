@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.2 - 2023-06-01]
+
+### Fixed
+
+- Fixed widget text overlapping
+
 ## [0.2.1 - 2023-05-26]
 
 ### Changed
