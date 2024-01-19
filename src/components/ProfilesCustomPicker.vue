@@ -1,37 +1,37 @@
 <template>
-	<div class="profiles-picker-content">
-		<div class="heading">
+	<div class="profile-picker">
+		<div class="profile-picker__heading">
 			<h2>
 				{{ t('users_picker', 'Profile picker') }}
 			</h2>
 			<div class="input-wrapper">
 				<NcSelect ref="profiles-search-input"
 					v-model="selectedProfile"
-					input-id="profiles-search-input"
+					input-id="profiles-search"
 					:loading="loading"
 					:filterable="false"
 					:placeholder="t('users_picker', 'Search for a user profile')"
 					:clear-search-on-blur="() => false"
 					:user-select="true"
 					:multiple="false"
-					:options="profiles"
+					:options="options"
 					@search="searchForProfile"
 					@option:selecting="resolveResult">
-					<template #no-options>
-						{{ searchQuery ? t('users_picker', 'Not found') : t('users_picker', 'Search for a user profile. Start typing') }}
+					<template #no-options="{ search }">
+						{{ search ? noResultText : t('users_picker', 'Search for a user profile. Start typing') }}
 					</template>
 				</NcSelect>
 			</div>
 			<NcEmptyContent class="empty-content">
 				<template #icon>
-					<UserIcon />
+					<Account :size="20" />
 				</template>
 			</NcEmptyContent>
 		</div>
-		<div class="footer">
+		<div class="profile-picker__footer">
 			<NcButton v-if="selectedProfile !== null"
 				type="primary"
-				:aria-label="t('users_picker', 'Submit selected user profile')"
+				:aria-label="t('users_picker', 'Insert selected user profile link')"
 				:disabled="loading || selectedProfile === null"
 				@click="submit">
 				{{ t('users_picker', 'Insert') }}
@@ -44,25 +44,26 @@
 </template>
 
 <script>
-import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue'
-import UserIcon from './icons/UserIcon.vue'
+import axios from '@nextcloud/axios'
+import { generateOcsUrl, generateUrl } from '@nextcloud/router'
+import debounce from 'debounce'
 
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 
-import axios from '@nextcloud/axios'
-import { generateOcsUrl, generateUrl } from '@nextcloud/router'
+import Account from 'vue-material-design-icons/Account.vue'
+import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue'
 
 export default {
-	name: 'UserProfilesCustomPicker',
+	name: 'ProfilesCustomPicker',
 
 	components: {
 		NcSelect,
 		NcButton,
-		ArrowRightIcon,
-		UserIcon,
 		NcEmptyContent,
+		Account,
+		ArrowRightIcon,
 	},
 
 	props: {
@@ -89,9 +90,15 @@ export default {
 	},
 
 	computed: {
-	},
-
-	watch: {
+		options() {
+			if (this.searchQuery !== '') {
+				return this.profiles
+			}
+			return []
+		},
+		noResultText() {
+			return this.loading ? t('users_picker', 'Searching …') : t('users_picker', 'Not found')
+		},
 	},
 
 	mounted() {
@@ -100,18 +107,28 @@ export default {
 
 	methods: {
 		focusOnInput() {
-			setTimeout(() => {
+			this.$nextTick(() => {
 				this.$refs['profiles-search-input'].$el.getElementsByTagName('input')[0]?.focus()
-			}, 300)
+			})
 		},
+
 		async searchForProfile(query) {
-			this.searchQuery = query
-			if (this.searchQuery === '') {
+			if (query.trim() === '' || query.trim().length < 3) {
 				return
 			}
+			this.searchQuery = query.trim()
 			this.loading = true
-			const url = generateOcsUrl('core/autocomplete/get?search={searchQuery}&itemType=%20&itemId=%20&shareTypes[]=0&limit=20', { searchQuery: this.searchQuery })
-			await axios.get(url).then(res => {
+			await this.debounceFindProfiles(query)
+		},
+
+		debounceFindProfiles: debounce(function(...args) {
+			this.findProfiles(...args)
+		}, 300),
+
+		async findProfiles(query) {
+			const url = generateOcsUrl('core/autocomplete/get?search={searchQuery}&itemType=%20&itemId=%20&shareTypes[]=0&limit=20', { searchQuery: query })
+			try {
+				const res = await axios.get(url)
 				this.profiles = res.data.ocs.data.map(userAutocomplete => {
 					return {
 						user: userAutocomplete.id,
@@ -121,35 +138,36 @@ export default {
 						isNoUser: userAutocomplete.source.startsWith('users'),
 					}
 				})
+			} catch (err) {
+				console.error(err)
+			} finally {
 				this.loading = false
-			}).catch(err => {
-				console.debug(err)
-			})
+			}
 		},
+
 		submit() {
 			this.resultUrl = window.location.origin + generateUrl(`/u/${this.selectedProfile.user.trim().toLowerCase()}`, null, { noRewrite: true })
 			this.$emit('submit', this.resultUrl)
 		},
+
 		resolveResult(selectedItem) {
 			this.loading = true
 			this.abortController = new AbortController()
 			this.selectedProfile = selectedItem
 			this.resultUrl = window.location.origin + generateUrl(`/u/${this.selectedProfile.user.trim().toLowerCase()}`, null, { noRewrite: true })
-			axios.get(generateOcsUrl('references/resolve', 2) + '?reference=' + encodeURIComponent(this.resultUrl), {
-				signal: this.abortController.signal,
-			})
-				.then((response) => {
-					this.reference = response.data.ocs.data.references[this.resultUrl]
+			try {
+				const res = axios.get(generateOcsUrl('references/resolve', 2) + '?reference=' + encodeURIComponent(this.resultUrl), {
+					signal: this.abortController.signal,
 				})
-				.catch((error) => {
-					console.error(error)
-				})
-				.then(() => {
-					this.loading = false
-				})
+				this.reference = res.data.ocs.data.references[this.resultUrl]
+			} catch (err) {
+				console.error(err)
+			} finally {
+				this.loading = false
+			}
 		},
+
 		clearSelection() {
-			console.debug('clearSelection')
 			this.selectedProfile = null
 			this.resultUrl = null
 			this.reference = null
@@ -159,11 +177,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.heading, .select {
-	width: 100%;
-}
-
-.profiles-picker-content {
+.profile-picker {
 	width: 100%;
 	min-height: 450px;
 	display: flex;
@@ -172,16 +186,21 @@ export default {
 	justify-content: space-between;
 	padding: 12px 16px 16px 16px;
 
-	h2 {
-		text-align: center;
+	&__heading, .select {
+		width: 100%;
+
+		h2 {
+			text-align: center;
+		}
 	}
 
-	.footer {
+	&__footer {
 		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: end;
 		margin-top: 12px;
+
 		> * {
 			margin-left: 4px;
 		}
